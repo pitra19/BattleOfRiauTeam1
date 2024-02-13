@@ -3,37 +3,36 @@ using System.Collections;
 
 public class WaveSpawner : MonoBehaviour
 {
-    public GameObject enemyPrefab; // Prefab musuh
-    public Transform[] spawnPoints; // Titik-titik spawn musuh
-    public float timeBetweenWaves = 5f; // Waktu antara gelombang
-    private float countdown = 2f;
+    public GameObject enemyPrefab; // Prefab untuk musuh
+    public Transform spawnPoint; // Posisi spawner
+    public float timeBetweenWaves = 5f; // Waktu antara gelombang musuh
+    public float timeBetweenEnemies = 0.5f; // Waktu antara munculnya musuh dalam satu gelombang
+    public int enemiesPerWave = 5; // Jumlah musuh dalam satu gelombang
+    private int waveNumber = 0; // Nomor gelombang
 
-    private int waveIndex = 0;
-
-    void Update()
+    void Start()
     {
-        if (countdown <= 0f)
-        {
-            StartCoroutine(SpawnWave());
-            countdown = timeBetweenWaves;
-        }
-
-        countdown -= Time.deltaTime;
+        StartCoroutine(SpawnWave());
     }
 
     IEnumerator SpawnWave()
     {
-        waveIndex++;
-        for (int i = 0; i < waveIndex; i++)
+        while (true)
         {
-            SpawnEnemy();
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(timeBetweenWaves);
+            waveNumber++;
+            Debug.Log("Wave " + waveNumber + " incoming!");
+
+            for (int i = 0; i < enemiesPerWave; i++)
+            {
+                SpawnEnemy();
+                yield return new WaitForSeconds(timeBetweenEnemies);
+            }
         }
     }
 
     void SpawnEnemy()
     {
-        Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
         Instantiate(enemyPrefab, spawnPoint.position, spawnPoint.rotation);
     }
 }
